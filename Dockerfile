@@ -21,7 +21,7 @@ FROM docker.io/alpine:latest as RUN
 ARG VERSION
 
 LABEL name="action-ship-it" \
-    maintainer="MAHDTech <MAHDTech@salt-labs.tech>" \
+    maintainer="MAHDTech <MAHDTech@saltlabs.tech>" \
     vendor="Salt Labs" \
     version="${VERSION}" \
     summary="GitHub Action to prepare for shipping time" \

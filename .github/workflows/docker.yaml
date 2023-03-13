@@ -80,3 +80,11 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - id: pr-status-giphy
+        name: PR Status Giphy
+        uses: dgteixeira/pr-status-giphy-action@v2
+        if: github.event_name == 'pull_request'
+        env:
+          GIPHY_API_KEY: ${{ secrets.GIPHY_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
