@@ -73,13 +73,11 @@ jobs:
         name: Test Results
         run: |
 
-          echo "Calender Version:"
-          echo ${{ steps.test_action.outputs.calver }}
+          echo "Calender Version ${{ steps.test_action.outputs.calver }}"
 
-          echo "Semantic Version:"
-          echo ${{ steps.test_action.outputs.semver }}
+          echo "Semantic Version ${{ steps.test_action.outputs.semver }}"
 
-          echo "Changelog:"
-          cat << EOF
+          echo "Changelog"
+          cat <<- "EOF"
           ${{ steps.test_action.outputs.changelog }}
           EOF
