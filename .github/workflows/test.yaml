@@ -1,0 +1,56 @@
+---
+
+name: Test
+
+on:
+  pull_request:
+
+env:
+  PROJECT: ${{ github.repository }}
+
+  REGISTRY: ghcr.io
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build-and-push-image:
+
+    name: Build and Push Container Image ${{ matrix.config.name }}
+
+    runs-on: ${{ matrix.os }}
+
+    timeout-minutes: 30
+    continue-on-error: false
+
+    strategy:
+      fail-fast: true
+      matrix:
+        os:
+          - ubuntu-latest
+        config:
+          - name: "action"
+            folder: "."
+
+    steps:
+
+      - id: prep_release
+        name: Prepare for Release
+        uses: ./
+        with:
+          loglevel: "INFO"
+          tag_enable: "TRUE"
+          tag_force: "FALSE"
+          changelog_enable: "TRUE"
+          git_pretty_format: "* %h %G? %aN - %s"
+          calver_enable: "TRUE"
+          calver_scheme: "YYYY.MM.GEN"
+          calver_split: "."
+          calver_split_mod: "."
+          calver_timezone: "Australia/Sydney"
+
+      - id: test
+        name: Test
+        run: |
+          echo ${{ steps.prep_release.outputs.calver }}
