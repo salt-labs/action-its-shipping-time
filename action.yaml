@@ -3,7 +3,7 @@
 # Description: GitHub Action to prepare for shipping time
 ##################################################
 
-name: "Ship It"
+name: "It's Shipping Time"
 author: "Salt Labs"
 description: "An opinionated GitHub Action to prepare for shipping time"
 branding:
@@ -118,7 +118,7 @@ outputs:
 
 runs:
   using: "docker"
-  #image: docker://ghcr.io/salt-labs/action-ship-it:stable
+  #image: docker://ghcr.io/salt-labs/action-its-shipping-time:stable
   image: Dockerfile
   entrypoint: "/scripts/entrypoint.sh"
   env:

@@ -25,12 +25,12 @@
 
 | Status                                                                                            | Description                                 |
 | :------------------------------------------------------------------------------------------------ | :------------------------------------------ |
-| ![Dependabot](https://api.dependabot.com/badges/status?host=github&repo=salt-labs/action-ship-it) | Automated dependency updates                |
-| ![Greetings](https://github.com/salt-labs/action-ship-it/workflows/Greetings/badge.svg)           | Greets new users to the project.            |
-| ![Docker](https://github.com/salt-labs/action-ship-it/workflows/Docker/badge.svg)                 | Testing and building containers with Docker |
-| ![Labeler](https://github.com/salt-labs/action-ship-it/workflows/Labeler/badge.svg)               | Automates label addition to issues and PRs  |
-| ![Release](https://github.com/salt-labs/action-ship-it/workflows/Release/badge.svg)               | Ships new releases :ship:                   |
-| ![Stale](https://github.com/salt-labs/action-ship-it/workflows/Stale/badge.svg)                   | Checks for Stale issues and PRs             |
+| ![Dependabot](https://api.dependabot.com/badges/status?host=github&repo=salt-labs/action-its-shipping-time) | Automated dependency updates                |
+| ![Greetings](https://github.com/salt-labs/action-its-shipping-time/workflows/Greetings/badge.svg)           | Greets new users to the project.            |
+| ![Docker](https://github.com/salt-labs/action-its-shipping-time/workflows/Docker/badge.svg)                 | Testing and building containers with Docker |
+| ![Labeler](https://github.com/salt-labs/action-its-shipping-time/workflows/Labeler/badge.svg)               | Automates label addition to issues and PRs  |
+| ![Release](https://github.com/salt-labs/action-its-shipping-time/workflows/Release/badge.svg)               | Ships new releases :ship:                   |
+| ![Stale](https://github.com/salt-labs/action-its-shipping-time/workflows/Stale/badge.svg)                   | Checks for Stale issues and PRs             |
 
 ## Description
 
@@ -78,7 +78,7 @@ The following outputs are available:
 | changelog  | A Changelog between `HEAD` and the last tag       | `* This is an amazing commit message` |
 | calver     | Calendar Version generated in the provided scheme | `2020.05.01-alpha`                    |
 | repo_owner | The GitHub repository organisation or owner       | `salt-labs`                           |
-| repo_name  | The GitHub repository name                        | `action-ship-it`                      |
+| repo_name  | The GitHub repository name                        | `action-its-shipping-time`                      |
 
 ## Secrets
 

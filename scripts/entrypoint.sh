@@ -177,7 +177,13 @@ then
 	CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
 
 	#echo "::set-output name=changelog::${CHANGELOG}"
-	echo "changelog=${CHANGELOG}" >> "$GITHUB_OUTPUT"
+	cat <<- EOF >> "$GITHUB_OUTPUT"
+	${CHANGELOG}
+	EOF
+
+	echo "CHANGELOG<<EOF" >> $GITHUB_ENV
+  echo "${CHANGELOG}" >> $GITHUB_ENV
+  echo "EOF" >> $GITHUB_ENV
 
 fi
 

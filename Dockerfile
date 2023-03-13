@@ -20,13 +20,13 @@ FROM docker.io/alpine:latest as RUN
 
 ARG VERSION
 
-LABEL name="action-ship-it" \
+LABEL name="action-its-shipping-time" \
     maintainer="MAHDTech <MAHDTech@saltlabs.tech>" \
     vendor="Salt Labs" \
     version="${VERSION}" \
     summary="GitHub Action to prepare for shipping time" \
-    url="https://github.com/salt-labs/action-ship-it" \
-    org.opencontainers.image.source="https://github.com/salt-labs/action-ship-it"
+    url="https://github.com/salt-labs/action-its-shipping-time" \
+    org.opencontainers.image.source="https://github.com/salt-labs/action-its-shipping-time"
 
 WORKDIR /
 
