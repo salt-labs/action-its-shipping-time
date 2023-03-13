@@ -1,0 +1,83 @@
+---
+
+name: Action Test
+
+on:
+  pull_request:
+    branches:
+      - $default-branch
+      - "trunk"
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+      - review_requested
+    paths-ignore:
+      - "docs/**"
+      - "*.md"
+
+env:
+  PROJECT: ${{ github.repository }}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  action-test:
+
+    name: Run Action Test
+
+    runs-on: ${{ matrix.os }}
+
+    timeout-minutes: 30
+    continue-on-error: false
+
+    strategy:
+      fail-fast: true
+      matrix:
+        os:
+          - ubuntu-latest
+        config:
+          - name: "action"
+            folder: "."
+
+    steps:
+
+      - id: checkout_repository
+        name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: false
+          clean: true
+
+      - id: test_action
+        name: Test Action
+        uses: ./
+        with:
+          loglevel: "INFO"
+          tag_enable: "FALSE"
+          tag_force: "FALSE"
+          changelog_enable: "TRUE"
+          git_pretty_format: "* %h %G? %aN - %s"
+          calver_enable: "TRUE"
+          calver_scheme: "YYYY.MM.GEN"
+          calver_split: "."
+          calver_split_mod: "."
+          calver_timezone: "Australia/Sydney"
+          semver_enable: "TRUE"
+
+      - id: test_results
+        name: Test Results
+        run: |
+
+          echo "Calender Version ${{ steps.test_action.outputs.calver }}"
+
+          echo "Semantic Version ${{ steps.test_action.outputs.semver }}"
+
+          echo "Changelog"
+          cat <<- "EOF"
+          ${{ steps.test_action.outputs.changelog }}
+          EOF
