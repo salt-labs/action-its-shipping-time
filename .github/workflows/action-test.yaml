@@ -15,7 +15,7 @@ defaults:
 jobs:
   action-test:
 
-    name: Run a quick Action test
+    name: Run Action Test
 
     runs-on: ${{ matrix.os }}
 
@@ -60,6 +60,6 @@ jobs:
       - id: test_results
         name: Test Results
         run: |
-          echo ${{ steps.test_action.outputs.calver }}
-          echo ${{ steps.test_action.outputs.semver }}
-          echo ${{ steps.test_action.outputs.changelog }}
+          echo ${{ steps.test_action.outputs.calver }} || true
+          echo ${{ steps.test_action.outputs.semver }} || true
+          echo ${{ steps.test_action.outputs.changelog }} || true
