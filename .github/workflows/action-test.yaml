@@ -55,8 +55,11 @@ jobs:
           calver_split: "."
           calver_split_mod: "."
           calver_timezone: "Australia/Sydney"
+          semver_enable: "TRUE"
 
       - id: test_results
         name: Test Results
         run: |
           echo ${{ steps.test_action.outputs.calver }}
+          echo ${{ steps.test_action.outputs.semver }}
+          echo ${{ steps.test_action.outputs.changelog }}
