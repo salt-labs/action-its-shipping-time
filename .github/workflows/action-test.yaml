@@ -1,6 +1,6 @@
 ---
 
-name: Test
+name: Action Test
 
 on:
   pull_request:
@@ -8,16 +8,14 @@ on:
 env:
   PROJECT: ${{ github.repository }}
 
-  REGISTRY: ghcr.io
-
 defaults:
   run:
     shell: bash
 
 jobs:
-  build-and-push-image:
+  action-test:
 
-    name: Build and Push Container Image ${{ matrix.config.name }}
+    name: Run a quick Action test
 
     runs-on: ${{ matrix.os }}
 
@@ -43,8 +41,8 @@ jobs:
           submodules: false
           clean: true
 
-      - id: prep_release
-        name: Prepare for Release
+      - id: test_action
+        name: Test Action
         uses: ./
         with:
           loglevel: "INFO"
@@ -58,7 +56,7 @@ jobs:
           calver_split_mod: "."
           calver_timezone: "Australia/Sydney"
 
-      - id: test
-        name: Test
+      - id: test_results
+        name: Test Results
         run: |
-          echo ${{ steps.prep_release.outputs.calver }}
+          echo ${{ steps.test_action.outputs.calver }}
