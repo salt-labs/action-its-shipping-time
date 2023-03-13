@@ -42,7 +42,7 @@ jobs:
         os:
           - ubuntu-latest
         config:
-          - name: "action-ship-it"
+          - name: "action"
             folder: "."
 
     steps:
@@ -62,12 +62,12 @@ jobs:
         name: Define Container metadata
         uses: docker/metadata-action@v3
         with:
-          images: ${{ env.REGISTRY }}/${{ env.PROJECT }}
-          #images: ${{ env.REGISTRY }}/${{ env.PROJECT }}/${{ matrix.config.name }}
+          #images: ${{ env.REGISTRY }}/${{ env.PROJECT }}
+          images: ${{ env.REGISTRY }}/${{ env.PROJECT }}/${{ matrix.config.name }}
           flavor: |
             latest=true
           tags: |
-            type=raw,value={{ date 'YYYYMMDD' }}
+            type=raw,value={{ date 'YYYY-MM-DD' }}
             type=sha,format=long
             type=ref,event=branch
             type=ref,event=tag
