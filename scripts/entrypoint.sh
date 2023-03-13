@@ -182,7 +182,12 @@ then
 	EOF
 
 	echo "CHANGELOG<<EOF" >> $GITHUB_ENV
-  echo "${CHANGELOG}" >> $GITHUB_ENV
+	echo "attempt 1" >> $GITHUB_ENV
+	cat <<- EOF >> $GITHUB_ENV
+	$CHANGELOG
+	EOF
+	echo "attempt 2" >> $GITHUB_ENV
+  echo "$CHANGELOG" >> $GITHUB_ENV
   echo "EOF" >> $GITHUB_ENV
 
 fi
