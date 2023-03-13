@@ -46,7 +46,7 @@ jobs:
         uses: ./
         with:
           loglevel: "INFO"
-          tag_enable: "TRUE"
+          tag_enable: "FALSE"
           tag_force: "FALSE"
           changelog_enable: "TRUE"
           git_pretty_format: "* %h %G? %aN - %s"

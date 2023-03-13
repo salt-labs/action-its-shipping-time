@@ -67,7 +67,6 @@ jobs:
           flavor: |
             latest=true
           tags: |
-            type=raw,value={{ date 'YYYY-MM-DD' }}
             type=sha,format=long
             type=ref,event=branch
             type=ref,event=tag

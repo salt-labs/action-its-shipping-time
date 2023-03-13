@@ -179,7 +179,7 @@ jobs:
         os:
           - ubuntu-latest
         config:
-          - name: "action-ship-it"
+          - name: "action"
             folder: "."
 
     if: ${{ needs.create_release.outputs.publish_container }}
@@ -201,12 +201,11 @@ jobs:
         name: Define Container metadata
         uses: docker/metadata-action@v3
         with:
-          images: ${{ env.REGISTRY }}/${{ env.PROJECT }}
-          #images: ${{ env.REGISTRY }}/${{ env.PROJECT }}/${{ matrix.config.name }}
+          #images: ${{ env.REGISTRY }}/${{ env.PROJECT }}
+          images: ${{ env.REGISTRY }}/${{ env.PROJECT }}/${{ matrix.config.name }}
           flavor: |
             latest=true
           tags: |
-            type=raw,value={{ date 'YYYYMMDD' }}
             type=raw,value=${{ needs.create_release.outputs.calver }}
             type=raw,value=release
             type=raw,value=stable
