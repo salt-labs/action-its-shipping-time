@@ -142,7 +142,8 @@ then
     CALVER="${CALVER_PREFIX}${CALVER}${CALVER_SUFFIX}"
 
 	writeLog "INFO" "Calendar Version: ${CALVER} Timezone: ${TZ}"
-	echo "::set-output name=calver::${CALVER}"
+	#echo "::set-output name=calver::${CALVER}"
+	echo "calver=${CALVER}" >> "$GITHUB_OUTPUT"
 
 fi
 
@@ -153,7 +154,8 @@ then
 	getSemVer "${SEMVER_TYPE}" "${SEMVER_PREFIX}" || { writeLog "ERROR" "Failed to get the current Semantic Version" ; exit 1 ; }
 
 	writeLog "INFO" "Semantic Version: ${SEMVER}"
-	echo "::set-output name=semver::${SEMVER}"
+	#echo "::set-output name=semver::${SEMVER}"
+	echo "semver=${SEMVER}" >> "$GITHUB_OUTPUT"
 
 fi
 
@@ -174,7 +176,8 @@ then
 	CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
 	CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
 
-	echo "::set-output name=changelog::${CHANGELOG}"
+	#echo "::set-output name=changelog::${CHANGELOG}"
+	echo "changelog=${CHANGELOG}" >> "$GITHUB_OUTPUT"
 
 fi
 
@@ -199,11 +202,13 @@ REPO_OWNER="${GITHUB_REPOSITORY%/*}"
 REPO_NAME="${GITHUB_REPOSITORY#*/}"
 
 writeLog "INFO" "Setting Output 'repo_owner' to ${REPO_OWNER}"
-echo "::set-output name=repo_owner::$REPO_OWNER"
+#echo "::set-output name=repo_owner::$REPO_OWNER"
 #echo "::set-env name=REPO_OWNER::$REPO_OWNER"
+echo "repo_owner=${REPO_OWNER}" >> "$GITHUB_OUTPUT"
 
 writeLog "INFO" "Setting Output 'repo_name' to ${REPO_NAME}"
-echo "::set-output name=repo_name::$REPO_NAME"
+#echo "::set-output name=repo_name::$REPO_NAME"
 #echo "::set-env name=REPO_NAME::$REPO_NAME"
+echo "repo_name=${REPO_NAME}" >> "$GITHUB_OUTPUT"
 
 exit 0

@@ -136,7 +136,8 @@ jobs:
         run: |
           if [ -f "Dockerfile" ];
           then
-            echo '::set-output name=publish::TRUE'
+            #echo '::set-output name=publish::TRUE'
+            echo "publish=TRUE" >> $GITHUB_ENV
           fi
 
     outputs:
