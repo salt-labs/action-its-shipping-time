@@ -4,6 +4,18 @@ name: Action Test
 
 on:
   pull_request:
+    branches:
+      - $default-branch
+      - "trunk"
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+      - review_requested
+    paths-ignore:
+      - "docs/**"
+      - "*.md"
 
 env:
   PROJECT: ${{ github.repository }}
@@ -60,6 +72,14 @@ jobs:
       - id: test_results
         name: Test Results
         run: |
-          echo ${{ steps.test_action.outputs.calver }} || true
-          echo ${{ steps.test_action.outputs.semver }} || true
-          echo ${{ steps.test_action.outputs.changelog }} || true
+
+          echo "Calender Version:"
+          echo ${{ steps.test_action.outputs.calver }}
+
+          echo "Semantic Version:"
+          echo ${{ steps.test_action.outputs.semver }}
+
+          echo "Changelog:"
+          cat << EOF
+          ${{ steps.test_action.outputs.changelog }}
+          EOF
