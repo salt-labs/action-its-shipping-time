@@ -56,7 +56,7 @@ jobs:
     steps:
       - id: checkout_repository
         name: Checkout repository with all history and tags
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_REPOS }}
         with:
@@ -187,7 +187,7 @@ jobs:
     steps:
       - id: checkout_repository
         name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - id: login
         name: Login to Container registry
