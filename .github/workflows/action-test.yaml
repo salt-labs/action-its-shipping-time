@@ -77,7 +77,10 @@ jobs:
 
           echo "Semantic Version ${{ steps.test_action.outputs.semver }}"
 
-          echo "Changelog"
+          echo "Changelog (output)"
           cat <<- "EOF"
           ${{ steps.test_action.outputs.changelog }}
           EOF
+
+          echo "Changelog (variable)"
+          echo "${{ env.CHANGELOG }}"

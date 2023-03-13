@@ -172,12 +172,22 @@ then
 	EOF
 
 	# Multi-line strings don't work in GitHub Actions without escaping.
-	CHANGELOG="${CHANGELOG//'%'/'%25'}"
-	CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
-	CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
+	#CHANGELOG="${CHANGELOG//'%'/'%25'}"
+	#CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
+	#CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
 
 	#echo "::set-output name=changelog::${CHANGELOG}"
-	echo "changelog=${CHANGELOG}" >> "$GITHUB_OUTPUT"
+	echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
+	cat <<- EOF >> $GITHUB_OUTPUT
+	$CHANGELOG
+	EOF
+  echo "EOF" >> $GITHUB_OUTPUT
+
+	echo "CHANGELOG<<EOF" >> $GITHUB_ENV
+	cat <<- EOF >> $GITHUB_ENV
+	$CHANGELOG
+	EOF
+  echo "EOF" >> $GITHUB_ENV
 
 fi
 
