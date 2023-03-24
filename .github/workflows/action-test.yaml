@@ -1,11 +1,9 @@
 ---
-
 name: Action Test
 
 on:
   pull_request:
     branches:
-      - $default-branch
       - "trunk"
     types:
       - opened
@@ -26,7 +24,6 @@ defaults:
 
 jobs:
   action-test:
-
     name: Run Action Test
 
     runs-on: ${{ matrix.os }}
@@ -44,7 +41,6 @@ jobs:
             folder: "."
 
     steps:
-
       - id: checkout_repository
         name: Checkout repository
         uses: actions/checkout@v3
