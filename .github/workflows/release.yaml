@@ -194,7 +194,7 @@ jobs:
 
       - id: meta
         name: Define Container metadata
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v4
         with:
           #images: ${{ env.REGISTRY }}/${{ env.PROJECT }}
           images: ${{ env.REGISTRY }}/${{ env.PROJECT }}/${{ matrix.config.name }}
