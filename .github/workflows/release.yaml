@@ -1,12 +1,10 @@
 ---
-
 name: Release
 
 on:
   # Treating approved PRs into trunk as "pre-releases"
   pull_request_review:
     branches:
-      - $default-branch
       - "trunk"
     types:
       - submitted
@@ -16,7 +14,6 @@ on:
   # Treating merged PRs into trunk as "releases"
   push:
     branches:
-      - $default-branch
       - "trunk"
     paths-ignore:
       - "docs/**"
@@ -83,7 +80,7 @@ jobs:
       - id: create_release_prerelease
         name: Create Pre-Release
         if: github.event.review.state == 'approved'
-        uses: ./
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -101,7 +98,6 @@ jobs:
             ```bash
             docker pull ghcr.io/${{ github.repository }}:${{ steps.prep_release.outputs.calver }}
             ```
-
           draft: false
           prerelease: true
 
@@ -162,7 +158,6 @@ jobs:
   #########################
 
   build-and-push-image:
-
     name: Build and Push Container Image ${{ matrix.config.name }}
 
     needs:

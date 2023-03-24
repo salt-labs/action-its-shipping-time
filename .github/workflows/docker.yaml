@@ -1,11 +1,9 @@
 ---
-
 name: Docker
 
 on:
   pull_request:
     branches:
-      - $default-branch
       - "trunk"
     types:
       - opened
@@ -28,7 +26,6 @@ defaults:
 
 jobs:
   build-and-push-image:
-
     name: Build and Push Container Image ${{ matrix.config.name }}
 
     runs-on: ${{ matrix.os }}
