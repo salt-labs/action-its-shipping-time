@@ -152,7 +152,7 @@ jobs:
 
       - id: build
         name: Build and push Container image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: ${{ matrix.config.folder }}
           push: true
