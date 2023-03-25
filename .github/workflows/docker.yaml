@@ -61,7 +61,7 @@ jobs:
     steps:
       - id: checkout_repository
         name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - id: pull_request_source_dest_branch
         name: Pull request source and destination branch
@@ -113,7 +113,7 @@ jobs:
     steps:
       - id: checkout_repository
         name: Checkout repository with all history and tags
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
