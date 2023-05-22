@@ -22,7 +22,7 @@ on:
       - "*.md"
 
 permissions:
-  contents: read
+  contents: write
   packages: write
   pull-requests: read
   statuses: read
