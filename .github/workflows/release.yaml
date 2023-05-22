@@ -31,7 +31,7 @@ env:
   REGISTRY: ghcr.io
   REGISTRY_NAMESPACE: ${{ github.repository_owner }}
   REGISTRY_USERNAME: ${{ github.actor }}
-  REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+  REGISTRY_PASSWORD: ${{ secrets.PAT_PACKAGES }}
 
   ORGANISATION: ${{ github.repository_owner }}
   PROJECT: ${{ github.event.repository.name }}
@@ -241,3 +241,5 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             VERSION=${{ needs.create_release.outputs.calver }}
+          secrets: |
+            "github_token=${{ env.REGISTRY_PASSWORD }}"

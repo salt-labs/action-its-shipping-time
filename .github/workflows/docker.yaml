@@ -156,4 +156,4 @@ jobs:
           build-args: |
             VERSION=latest
           secrets: |
-            GITHUB_TOKEN="${{ env.REGISTRY_PASSWORD }}"
+            "github_token=${{ env.REGISTRY_PASSWORD }}"
