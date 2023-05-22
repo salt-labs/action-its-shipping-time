@@ -29,6 +29,8 @@ export CALVER_SCHEME="${INPUT_CALVER_SCHEME:=YYYY.0M.0D.GEN}"
 export CALVER_SPLIT="${INPUT_CALVER_SPLIT:=.}"
 export CALVER_SPLIT_MOD="${INPUT_CALVER_SPLIT_MOD:=$CALVER_SPLIT}"
 export TZ="${INPUT_CALVER_TIMEZONE:=UTC-0}"
+export CALVER_PREFIX="${INPUT_CALVER_PREFIX}"
+export CALVER_SUFFIX="${INPUT_CALVER_SUFFIX}"
 
 # Semantic Versioning
 export SEMVER_ENABLE="${INPUT_SEMVER_ENABLE:=FALSE}"
@@ -65,13 +67,13 @@ declare -r REQ_BINS=(
 source "$(dirname "${BASH_SOURCE[0]}")/functions.sh"
 
 checkLogLevel "${LOGLEVEL}" || {
-	writeLog                             "ERROR" "Failed to check the log level"
-	exit                                                                                1
+	writeLog "ERROR" "Failed to check the log level"
+	exit 1
 }
 
 checkReqs || {
-	writeLog           "ERROR" "Failed to check all requirements"
-	exit                                                                 1
+	writeLog "ERROR" "Failed to check all requirements"
+	exit 1
 }
 
 # Used if the CI is running a simple test
@@ -96,6 +98,8 @@ fi
 
 if [ "${LOGLEVEL}" == "DEBUG" ]; then
 
+	writeLog "DEBUG" "########## Start Dump ##########"
+
 	writeLog "DEBUG" "Dumping diagnostic information for shell ${SHELL} ${BASH_VERSION}"
 
 	writeLog "DEBUG" "########## Environment ##########"
@@ -110,6 +114,8 @@ if [ "${LOGLEVEL}" == "DEBUG" ]; then
 	writeLog "DEBUG" "########## Exported Function Contents ##########"
 	export -f
 
+	writeLog "DEBUG" "########## End Dump ##########"
+
 fi
 
 #########################
@@ -118,14 +124,14 @@ fi
 
 # Configure Git with a default user
 gitConfig || {
-	writeLog           "ERROR" "Failed to configure the git user"
-	exit                                                                 1
+	writeLog "ERROR" "Failed to configure the git user"
+	exit 1
 }
 
 # Fetch all the tags that are required for this Action to work
 gitFetchAll || {
-	writeLog             "ERROR" "Failed to fetch all the Git tags!"
-	exit                                                                    1
+	writeLog "ERROR" "Failed to fetch all the Git tags!"
+	exit 1
 }
 
 # Check the TimeZone is available if it was modified by an input
@@ -144,8 +150,8 @@ if [ "${CALVER_ENABLE^^}" == "TRUE" ]; then
 	writeLog "INFO" "Determining Calendar Version"
 
 	getCalVer "${CALVER_SCHEME}" "${CALVER_SPLIT}" "${CALVER_SPLIT_MOD}" || {
-		writeLog                                                                      "ERROR" "Failed to get the current Calendar Version"
-		exit                                                                                                                                      1
+		writeLog "ERROR" "Failed to get the current Calendar Version"
+		exit 1
 	}
 
 	# Append any prefix and suffix if provided
@@ -161,8 +167,8 @@ fi
 if [ "${SEMVER_ENABLE^^}" == "TRUE" ]; then
 
 	getSemVer "${SEMVER_TYPE}" "${SEMVER_PREFIX}" || {
-		writeLog                                               "ERROR" "Failed to get the current Semantic Version"
-		exit                                                                                                               1
+		writeLog "ERROR" "Failed to get the current Semantic Version"
+		exit 1
 	}
 
 	writeLog "INFO" "Semantic Version: ${SEMVER}"
@@ -175,8 +181,8 @@ fi
 if [ "${CHANGELOG_ENABLE^^}" == "TRUE" ]; then
 
 	gitChangelog || {
-		writeLog              "ERROR" "Failed to generate change log"
-		exit                                                                 1
+		writeLog "ERROR" "Failed to generate change log"
+		exit 1
 	}
 
 	writeLog "INFO" "Branch changelog"
@@ -210,15 +216,15 @@ if [ "${TAG_ENABLE^^}" == "TRUE" ]; then
 
 	if [ "${CALVER_ENABLE^^}" == "TRUE" ]; then
 		gitTag "${CALVER}" "${TAG_FORCE^^}" || {
-			writeLog                                     "ERROR" "Failed to apply the tag ${CALVER}"
-			exit                                                                                            1
+			writeLog "ERROR" "Failed to apply the tag ${CALVER}"
+			exit 1
 		}
 	fi
 
 	if [ "${SEMVER_ENABLE^^}" == "TRUE" ]; then
 		gitTag "${SEMVER}" "${TAG_FORCE^^}" || {
-			writeLog                                     "ERROR" "Failed to apply the tag ${SEMVER}"
-			exit                                                                                            1
+			writeLog "ERROR" "Failed to apply the tag ${SEMVER}"
+			exit 1
 		}
 	fi
 

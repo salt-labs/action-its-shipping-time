@@ -32,8 +32,8 @@ function checkReqs() {
 	for BIN in "${REQ_BINS[@]}"; do
 		writeLog "DEBUG" "Checking for dependant binary ${BIN}"
 		checkBin "${BIN}" || {
-			writeLog                   "ERROR" "Please install the ${BIN} binary on this system in order to run ${SCRIPT}"
-			return                                                                                                                  1
+			writeLog "ERROR" "Please install the ${BIN} binary on this system in order to run ${SCRIPT}"
+			return                                                                              1
 		}
 	done
 
@@ -235,13 +235,13 @@ function gitConfig() {
 	git config --global user.email "${GITHUB_ACTOR:-user}@users.noreply.github.com" ||
 		{
 			writeLog "ERROR" "Failed to configure the git user email"
-			return                                                            1
+			return                        1
 		}
 
 	git config --global user.name "GitHub Actions" ||
 		{
 			writeLog "ERROR" "Failed to configure the git user name"
-			return                                                           1
+			return                       1
 		}
 
 	return 0
@@ -257,7 +257,7 @@ function gitFetchAll() {
 	git fetch --prune --tags --prune-tags --all ||
 		{
 			writeLog "ERROR" "Failed to fetch git tags"
-			return                                              1
+			return          1
 		}
 
 	return 0
@@ -267,6 +267,7 @@ function gitFetchAll() {
 function getCalVer() {
 
 	# Determines the current Calendar Version in the provided scheme.
+	writeLog "DEBUG" "Entered getCalVer"
 
 	# Parameters
 	local SCHEME="${1}"
@@ -278,6 +279,10 @@ function getCalVer() {
 	SCHEME="${SCHEME:=YYYY.0M.0D.GEN}"
 	SPLIT="${SPLIT:=.}"
 	SPLIT_MOD="${SPLIT_MOD:=$SPLIT}"
+
+	writeLog "DEBUG" "Scheme: ${SCHEME}"
+	writeLog "DEBUG" "Split: ${SPLIT}"
+	writeLog "DEBUG" "Split Mod: ${SPLIT_MOD}"
 
 	# The user provided CalVer
 	local -a ARR_SCHEME_VER
@@ -323,11 +328,23 @@ function getCalVer() {
 	MICRO_VER="${ARR_SCHEME_VER[2]}"
 	MOD_VER="${ARR_SCHEME_VER[3]}"
 
+	writeLog "DEBUG" "## Split Ver ###"
+	writeLog "DEBUG" "Major: ${MAJOR_VER:-EMPTY}"
+	writeLog "DEBUG" "Minor: ${MINOR_VER:-EMPTY}"
+	writeLog "DEBUG" "Micro: ${MICRO_VER:-EMPTY}"
+	writeLog "DEBUG" "Mod: ${MOD_VER:-EMPTY}"
+
 	# Do the same for the Git Tag
 	MAJOR_TAG="${ARR_SCHEME_TAG[0]}"
 	MINOR_TAG="${ARR_SCHEME_TAG[1]}"
 	MICRO_TAG="${ARR_SCHEME_TAG[2]}"
 	MOD_TAG="${ARR_SCHEME_TAG[3]}"
+
+	writeLog "DEBUG" "## Split Tag ###"
+	writeLog "DEBUG" "Major: ${MAJOR_TAG:-EMPTY}"
+	writeLog "DEBUG" "Minor: ${MINOR_TAG:-EMPTY}"
+	writeLog "DEBUG" "Micro: ${MICRO_TAG:-EMPTY}"
+	writeLog "DEBUG" "Mod: ${MOD_TAG:-EMPTY}"
 
 	# If the MODIFIER is empty, split MICRO again by SPLIT_MOD
 	mapfile -t -d "${SPLIT_MOD}" ARR_MOD_VER <<< "${MICRO_VER}"
@@ -337,9 +354,17 @@ function getCalVer() {
 	MICRO_VER="${ARR_MOD_VER[0]}"
 	MOD_VER="${MOD_VER:=${ARR_MOD_VER[1]}}"
 
+	writeLog "DEBUG" "## Split Mod Ver ###"
+	writeLog "DEBUG" "Micro: ${MICRO_VER:-EMPTY}"
+	writeLog "DEBUG" "Mod: ${MOD_VER:-EMPTY}"
+
 	# Re-split the Tag into MICRO and MOD (only if MOD is empty)
 	MICRO_TAG="${ARR_MOD_TAG[0]}"
 	MOD_TAG="${MOD_TAG:=${ARR_MOD_TAG[1]}}"
+
+	writeLog "DEBUG" "## Split Mod Tag ###"
+	writeLog "DEBUG" "Micro: ${MICRO_TAG:-EMPTY}"
+	writeLog "DEBUG" "Mod: ${MOD_TAG:-EMPTY}"
 
 	# Strip all new lines
 	MAJOR_VER="${MAJOR_VER//$'\n'/}"
@@ -392,19 +417,19 @@ function getCalVer() {
 	# Determine if there is a potential tag clash
 	[ "${MAJOR_VER:-EMPTY}" = "${MAJOR_TAG}" ] && {
 		MAJOR_MATCH="TRUE"
-		writeLog                                                                 "DEBUG" "MAJOR Matched existing tag!"
+		writeLog                             "DEBUG" "MAJOR Matched existing tag!"
 	}
 	[ "${MINOR_VER:-EMPTY}" = "${MINOR_TAG}" ] && {
 		MINOR_MATCH="TRUE"
-		writeLog                                                                 "DEBUG" "MINOR Matched existing tag!"
+		writeLog                             "DEBUG" "MINOR Matched existing tag!"
 	}
 	[ "${MICRO_VER:-EMPTY}" = "${MICRO_TAG}" ] && {
 		MICRO_MATCH="TRUE"
-		writeLog                                                                 "DEBUG" "MICRO Matched existing tag!"
+		writeLog                             "DEBUG" "MICRO Matched existing tag!"
 	}
 	[ "${MOD_VER:-EMPTY}" = "${MOD_TAG}" ] && {
 		MOD_MATCH="TRUE"
-		writeLog                                                           "DEBUG" "MODIFIER Matched existing tag!"
+		writeLog                       "DEBUG" "MODIFIER Matched existing tag!"
 	}
 
 	# The Calendar Versioning scheme stipulates that;
@@ -598,8 +623,8 @@ function gitChangelog() {
 		CHANGELOG=$(git --git-dir="${GIT_DIR}" log --pretty=format:"${GIT_PRETTY_FORMAT}")
 
 		checkResult $? || {
-			writeLog                "ERROR" "Failed to obtain change log for full commit history"
-			return                                                                                         1
+			writeLog "ERROR" "Failed to obtain change log for full commit history"
+			return                                                     1
 		}
 
 	else
@@ -609,8 +634,8 @@ function gitChangelog() {
 		CHANGELOG=$(git --git-dir="${GIT_DIR}" log "${TAG}"..HEAD --pretty=format:"${GIT_PRETTY_FORMAT}")
 
 		checkResult $? || {
-			writeLog                "ERROR" "Failed to obtain change log between HEAD and ${TAG}"
-			return                                                                                         1
+			writeLog "ERROR" "Failed to obtain change log between HEAD and ${TAG}"
+			return                                                     1
 		}
 
 	fi
@@ -665,7 +690,7 @@ function gitTag() {
 			tag --annotate --no-sign --force --message "Release ${TAG}" "${TAG}" ||
 			{
 				writeLog "ERROR" "Unable to apply tag ${TAG}"
-				return                                                 1
+				return             1
 			}
 
 	else
@@ -674,7 +699,7 @@ function gitTag() {
 			tag --annotate --no-sign --message "Release ${TAG}" "${TAG}" ||
 			{
 				writeLog "ERROR" "Unable to apply tag ${TAG}. Force is not enabled"
-				return                                                                       0
+				return                                   0
 			}
 
 	fi
@@ -686,7 +711,7 @@ function gitTag() {
 		tag --list -n1 ||
 		{
 			writeLog "ERROR" "Failed to list tags"
-			return                                          1
+			return      1
 		}
 
 	writeLog "INFO" "Pushing new Git tag ${TAG} to origin"
@@ -696,7 +721,7 @@ function gitTag() {
 		push origin --force --tags ||
 		{
 			writeLog "ERROR" "Failed to push tag ${TAG} to origin"
-			return                                                          1
+			return                      1
 		}
 
 	return 0

@@ -77,6 +77,18 @@ inputs:
     required: false
     default: "UTC-0"
 
+  # INPUT_CALVER_PREFIX
+  calver_prefix:
+    description: "A manual prefix to apply to the calendar version number. For example; 'v'"
+    required: false
+    default: ""
+
+  # INPUT_CALVER_SUFFIX
+  calver_suffix:
+    description: "A manual suffix to apply to the calendar version number. For example; '-dev'"
+    required: false
+    default: ""
+
   ### SemVer ###
 
   # INPUT_SEMVER_ENABLE

@@ -48,7 +48,7 @@ jobs:
 
       - id: prep_release
         name: Prepare for Release
-        uses: salt-labs/action-its-shipping-time@master
+        uses: salt-labs/action-its-shipping-time@trunk
         with:
           loglevel: "INFO"
           tag_enable: "TRUE"
@@ -59,7 +59,7 @@ jobs:
           calver_suffix: ""
           calver_split: "."
           calver_split_mod: "."
-          timezone: "Australia/Sydney"
+          calver_timezone: "Australia/Sydney"
 
       - id: create_release
         name: Create Release
