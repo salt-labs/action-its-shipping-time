@@ -1,0 +1,60 @@
+---
+name: Cleanup
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  ORGANISATION: ${{ github.repository_owner }}
+  PROJECT: ${{ github.event.repository.name }}
+
+jobs:
+
+  cleanup:
+    name: Cleanup Packages
+
+    runs-on: ${{ matrix.os }}
+
+    timeout-minutes: 30
+    continue-on-error: false
+
+    strategy:
+      fail-fast: false
+      matrix:
+        container:
+          - "action"
+        os:
+          - ubuntu-latest
+
+    steps:
+      - name: Prune all untagged images
+        uses: vlaurin/action-ghcr-prune@v0.5.0
+        with:
+          token: ${{ secrets.PAT_PACKAGES }}
+          organization: salt-labs
+          container: ${{ env.PROJECT }}/${{ matrix.container }}
+          prune-untagged: true
+          dry-run: false
+
+      - name: Prune old tagged images
+        uses: vlaurin/action-ghcr-prune@v0.5.0
+        with:
+          token: ${{ secrets.PAT_PACKAGES }}
+          organization: salt-labs
+          container: ${{ env.PROJECT }}/${{ matrix.container }}
+          keep-younger-than: 30
+          keep-last: 10
+          prune-tags-regexes: |
+            ^2023.*
+          dry-run: false

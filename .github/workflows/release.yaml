@@ -2,6 +2,7 @@
 name: Release
 
 on:
+
   # Treating approved PRs into trunk as "pre-releases"
   pull_request_review:
     branches:
@@ -11,6 +12,7 @@ on:
     paths-ignore:
       - "docs/**"
       - "*.md"
+
   # Treating merged PRs into trunk as "releases"
   push:
     branches:
@@ -18,14 +20,25 @@ on:
     paths-ignore:
       - "docs/**"
       - "*.md"
+
+permissions:
+  contents: read
+  packages: write
+  pull-requests: read
+  statuses: read
+
 env:
-  PROJECT: ${{ github.repository }}
-
   REGISTRY: ghcr.io
-
   REGISTRY_NAMESPACE: ${{ github.repository_owner }}
   REGISTRY_USERNAME: ${{ github.actor }}
-  REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PAT }}
+  REGISTRY_PASSWORD: ${{ secrets.PAT_PACKAGES }}
+
+  ORGANISATION: ${{ github.repository_owner }}
+  PROJECT: ${{ github.event.repository.name }}
+
+  # Works on pushes or PRs
+  BRANCH_NAME_CURRENT: ${{ github.head_ref || github.ref_name }}
+  BRANCH_NAME_DEFAULT: ${{ github.event.repository.default_branch }}
 
 defaults:
   run:
@@ -55,7 +68,7 @@ jobs:
         name: Checkout repository with all history and tags
         uses: actions/checkout@v3
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_REPOS }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           fetch-depth: 0
           submodules: false
@@ -122,7 +135,6 @@ jobs:
             ```bash
             docker pull ghcr.io/${{ github.repository }}:${{ steps.prep_release.outputs.calver }}
             ```
-
           draft: true
           prerelease: false
 
@@ -130,10 +142,9 @@ jobs:
         name: Test for a Dockerfile
         shell: bash
         run: |
-          if [ -f "Dockerfile" ];
+          if [[ -f "Dockerfile" ]];
           then
-            #echo '::set-output name=publish::TRUE'
-            echo "publish=TRUE" >> $GITHUB_ENV
+            echo "publish=TRUE" >> $GITHUB_OUTPUT
           fi
 
     outputs:
@@ -183,21 +194,33 @@ jobs:
       - id: checkout_repository
         name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: false
+          clean: true
+          persist-credentials: true
+
+      - id: setup_qemu
+        name: Setup QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - id: setup_buildx
+        name: Setup BuildX
+        uses: docker/setup-buildx-action@v1
 
       - id: login
         name: Login to Container registry
         uses: docker/login-action@v2
         with:
           registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ env.REGISTRY_USERNAME }}
+          password: ${{ env.REGISTRY_PASSWORD }}
 
       - id: meta
         name: Define Container metadata
         uses: docker/metadata-action@v4
         with:
-          #images: ${{ env.REGISTRY }}/${{ env.PROJECT }}
-          images: ${{ env.REGISTRY }}/${{ env.PROJECT }}/${{ matrix.config.name }}
+          images: ${{ env.REGISTRY }}/${{ env.REGISTRY_NAMESPACE }}/${{ env.PROJECT }}/${{ matrix.config.name }}
           flavor: |
             latest=true
           tags: |
@@ -216,3 +239,7 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VERSION=${{ needs.create_release.outputs.calver }}
+          secrets: |
+            "github_token=${{ env.REGISTRY_PASSWORD }}"
