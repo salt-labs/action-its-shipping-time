@@ -63,21 +63,10 @@ jobs:
         name: Checkout repository
         uses: actions/checkout@v2
 
-      - id: pull_request_source_dest_branch
-        name: Pull request source and destination branch
-        env:
-          BRANCH_SOURCE: ${{ github.head_ref }}
-          BRANCH_DEST: ${{ github.base_ref }}
-        run: |
-          echo "Pull Request Source: ${BRANCH_SOURCE}"
-          echo "Pull Request Destination: ${BRANCH_DEST}"
-        if: github.event_name == 'pull_request'
-
       - id: docker_build
         name: Docker Image Build
         run: >
           docker image build
-          --rm
           --tag test:latest
           .
 
@@ -103,19 +92,21 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     timeout-minutes: 30
+    continue-on-error: false
 
     strategy:
       fail-fast: true
       matrix:
         os:
           - ubuntu-latest
+        config:
+          - name: "action"
+            folder: "."
 
     steps:
       - id: checkout_repository
         name: Checkout repository with all history and tags
-        uses: actions/checkout@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
           submodules: false
@@ -132,7 +123,7 @@ jobs:
 
       - id: login
         name: Login to Container registry
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ env.REGISTRY_USERNAME }}
@@ -142,17 +133,20 @@ jobs:
         name: Define Container metadata
         uses: docker/metadata-action@v4
         with:
-          images: ${{ env.REGISTRY }}/${{ env.ORGANISATION }}/${{ env.PROJECT }}
+          #images: ${{ env.REGISTRY }}/${{ env.ORGANISATION }}/${{ env.PROJECT }}
+          images: ${{ env.REGISTRY }}/${{ env.PROJECT }}/${{ matrix.config.name }}
           flavor: |
             latest=true
           tags: |
+            type=raw,value=release-candidate
+            type=raw,value=unstable
             type=sha,format=long
             type=ref,event=branch
             type=ref,event=tag
 
       - id: build
         name: Build and push Container image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: ${{ matrix.config.folder }}
           push: true
