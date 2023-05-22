@@ -33,7 +33,7 @@ function checkReqs() {
 		writeLog "DEBUG" "Checking for dependant binary ${BIN}"
 		checkBin "${BIN}" || {
 			writeLog "ERROR" "Please install the ${BIN} binary on this system in order to run ${SCRIPT}"
-			return                                                                                1
+			return                                                                              1
 		}
 	done
 
@@ -235,13 +235,13 @@ function gitConfig() {
 	git config --global user.email "${GITHUB_ACTOR:-user}@users.noreply.github.com" ||
 		{
 			writeLog "ERROR" "Failed to configure the git user email"
-			return                          1
+			return                        1
 		}
 
 	git config --global user.name "GitHub Actions" ||
 		{
 			writeLog "ERROR" "Failed to configure the git user name"
-			return                         1
+			return                       1
 		}
 
 	return 0
@@ -257,7 +257,7 @@ function gitFetchAll() {
 	git fetch --prune --tags --prune-tags --all ||
 		{
 			writeLog "ERROR" "Failed to fetch git tags"
-			return            1
+			return          1
 		}
 
 	return 0
@@ -417,19 +417,19 @@ function getCalVer() {
 	# Determine if there is a potential tag clash
 	[ "${MAJOR_VER:-EMPTY}" = "${MAJOR_TAG}" ] && {
 		MAJOR_MATCH="TRUE"
-		writeLog                               "DEBUG" "MAJOR Matched existing tag!"
+		writeLog                             "DEBUG" "MAJOR Matched existing tag!"
 	}
 	[ "${MINOR_VER:-EMPTY}" = "${MINOR_TAG}" ] && {
 		MINOR_MATCH="TRUE"
-		writeLog                               "DEBUG" "MINOR Matched existing tag!"
+		writeLog                             "DEBUG" "MINOR Matched existing tag!"
 	}
 	[ "${MICRO_VER:-EMPTY}" = "${MICRO_TAG}" ] && {
 		MICRO_MATCH="TRUE"
-		writeLog                               "DEBUG" "MICRO Matched existing tag!"
+		writeLog                             "DEBUG" "MICRO Matched existing tag!"
 	}
 	[ "${MOD_VER:-EMPTY}" = "${MOD_TAG}" ] && {
 		MOD_MATCH="TRUE"
-		writeLog                         "DEBUG" "MODIFIER Matched existing tag!"
+		writeLog                       "DEBUG" "MODIFIER Matched existing tag!"
 	}
 
 	# The Calendar Versioning scheme stipulates that;
@@ -624,7 +624,7 @@ function gitChangelog() {
 
 		checkResult $? || {
 			writeLog "ERROR" "Failed to obtain change log for full commit history"
-			return                                                       1
+			return                                                     1
 		}
 
 	else
@@ -635,7 +635,7 @@ function gitChangelog() {
 
 		checkResult $? || {
 			writeLog "ERROR" "Failed to obtain change log between HEAD and ${TAG}"
-			return                                                       1
+			return                                                     1
 		}
 
 	fi
@@ -690,7 +690,7 @@ function gitTag() {
 			tag --annotate --no-sign --force --message "Release ${TAG}" "${TAG}" ||
 			{
 				writeLog "ERROR" "Unable to apply tag ${TAG}"
-				return               1
+				return             1
 			}
 
 	else
@@ -699,7 +699,7 @@ function gitTag() {
 			tag --annotate --no-sign --message "Release ${TAG}" "${TAG}" ||
 			{
 				writeLog "ERROR" "Unable to apply tag ${TAG}. Force is not enabled"
-				return                                     0
+				return                                   0
 			}
 
 	fi
@@ -711,7 +711,7 @@ function gitTag() {
 		tag --list -n1 ||
 		{
 			writeLog "ERROR" "Failed to list tags"
-			return        1
+			return      1
 		}
 
 	writeLog "INFO" "Pushing new Git tag ${TAG} to origin"
@@ -721,7 +721,7 @@ function gitTag() {
 		push origin --force --tags ||
 		{
 			writeLog "ERROR" "Failed to push tag ${TAG} to origin"
-			return                        1
+			return                      1
 		}
 
 	return 0
