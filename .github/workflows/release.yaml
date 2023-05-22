@@ -31,7 +31,7 @@ env:
   REGISTRY: ghcr.io
   REGISTRY_NAMESPACE: ${{ github.repository_owner }}
   REGISTRY_USERNAME: ${{ github.actor }}
-  REGISTRY_PASSWORD: ${{ secrets.PAT_PACKAGES }}
+  REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
 
   ORGANISATION: ${{ github.repository_owner }}
   PROJECT: ${{ github.event.repository.name }}
@@ -220,8 +220,7 @@ jobs:
         name: Define Container metadata
         uses: docker/metadata-action@v4
         with:
-          #images: ${{ env.REGISTRY }}/${{ env.PROJECT }}
-          images: ${{ env.REGISTRY }}/${{ env.PROJECT }}/${{ matrix.config.name }}
+          images: ${{ env.REGISTRY }}/${{ env.REGISTRY_NAMESPACE }}/${{ env.PROJECT }}/${{ matrix.config.name }}
           flavor: |
             latest=true
           tags: |
