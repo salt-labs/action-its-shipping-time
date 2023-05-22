@@ -64,17 +64,23 @@ declare -r REQ_BINS=(
 # shellcheck source=functions.sh
 source "$(dirname "${BASH_SOURCE[0]}")/functions.sh"
 
-checkLogLevel "${LOGLEVEL}" || { writeLog "ERROR" "Failed to check the log level" ; exit 1 ; }
+checkLogLevel "${LOGLEVEL}" || {
+	writeLog                             "ERROR" "Failed to check the log level"
+	exit                                                                                1
+}
 
-checkReqs || { writeLog "ERROR" "Failed to check all requirements" ; exit 1 ; }
+checkReqs || {
+	writeLog           "ERROR" "Failed to check all requirements"
+	exit                                                                 1
+}
 
 # Used if the CI is running a simple test
 case "${1,,}" in
 
-	*help | *usage )
+	*help | *usage)
 		usage
 		exit 0
-	;;
+		;;
 
 esac
 
@@ -82,15 +88,13 @@ esac
 # Debug
 #########################
 
-if [ "${ACTION:-FALSE}" == "TRUE" ];
-then
+if [ "${ACTION:-FALSE}" == "TRUE" ]; then
 
 	writeLog "INFO" "Running in GitHub Actions"
 
 fi
 
-if [ "${LOGLEVEL}" == "DEBUG" ];
-then
+if [ "${LOGLEVEL}" == "DEBUG" ]; then
 
 	writeLog "DEBUG" "Dumping diagnostic information for shell ${SHELL} ${BASH_VERSION}"
 
@@ -101,10 +105,10 @@ then
 	export
 
 	writeLog "DEBUG" "########## Exported Function Names ##########"
-  	declare -x -F
+	declare -x -F
 
 	writeLog "DEBUG" "########## Exported Function Contents ##########"
-  	export -f
+	export -f
 
 fi
 
@@ -113,16 +117,20 @@ fi
 #########################
 
 # Configure Git with a default user
-gitConfig || { writeLog "ERROR" "Failed to configure the git user" ; exit 1 ; }
+gitConfig || {
+	writeLog           "ERROR" "Failed to configure the git user"
+	exit                                                                 1
+}
 
 # Fetch all the tags that are required for this Action to work
-gitFetchAll || { writeLog "ERROR" "Failed to fetch all the Git tags!" ; exit 1 ; }
+gitFetchAll || {
+	writeLog             "ERROR" "Failed to fetch all the Git tags!"
+	exit                                                                    1
+}
 
 # Check the TimeZone is available if it was modified by an input
-if [ "${TZ}" != "UTC-0" ];
-then
-	if ( grep -qr "${TZ}" "/usr/share/zoneinfo/" );
-	then
+if [ "${TZ}" != "UTC-0" ]; then
+	if (grep -qr "${TZ}" "/usr/share/zoneinfo/"); then
 		writeLog "INFO" "Time Zone info for ${TZ} is available"
 	else
 		writeLog "ERROR" "No Time Zone info is available for ${TZ}. Defaulting to UTC-0"
@@ -131,15 +139,17 @@ then
 fi
 
 # Get the current Calendar Version into $CALVER if enabled
-if [ "${CALVER_ENABLE^^}" == "TRUE" ];
-then
+if [ "${CALVER_ENABLE^^}" == "TRUE" ]; then
 
 	writeLog "INFO" "Determining Calendar Version"
 
-	getCalVer "${CALVER_SCHEME}" "${CALVER_SPLIT}" "${CALVER_SPLIT_MOD}" || { writeLog "ERROR" "Failed to get the current Calendar Version" ; exit 1 ; }
+	getCalVer "${CALVER_SCHEME}" "${CALVER_SPLIT}" "${CALVER_SPLIT_MOD}" || {
+		writeLog                                                                      "ERROR" "Failed to get the current Calendar Version"
+		exit                                                                                                                                      1
+	}
 
-    # Append any prefix and suffix if provided
-    CALVER="${CALVER_PREFIX}${CALVER}${CALVER_SUFFIX}"
+	# Append any prefix and suffix if provided
+	CALVER="${CALVER_PREFIX}${CALVER}${CALVER_SUFFIX}"
 
 	writeLog "INFO" "Calendar Version: ${CALVER} Timezone: ${TZ}"
 	#echo "::set-output name=calver::${CALVER}"
@@ -148,10 +158,12 @@ then
 fi
 
 # Determine the current Semantic Version into $SEMVER if enabled
-if [ "${SEMVER_ENABLE^^}" == "TRUE" ];
-then
+if [ "${SEMVER_ENABLE^^}" == "TRUE" ]; then
 
-	getSemVer "${SEMVER_TYPE}" "${SEMVER_PREFIX}" || { writeLog "ERROR" "Failed to get the current Semantic Version" ; exit 1 ; }
+	getSemVer "${SEMVER_TYPE}" "${SEMVER_PREFIX}" || {
+		writeLog                                               "ERROR" "Failed to get the current Semantic Version"
+		exit                                                                                                               1
+	}
 
 	writeLog "INFO" "Semantic Version: ${SEMVER}"
 	#echo "::set-output name=semver::${SEMVER}"
@@ -160,15 +172,17 @@ then
 fi
 
 # Output a current changelog if enabled
-if [ "${CHANGELOG_ENABLE^^}" == "TRUE" ] ;
-then
+if [ "${CHANGELOG_ENABLE^^}" == "TRUE" ]; then
 
-	gitChangelog || { writeLog "ERROR" "Failed to generate change log" ; exit 1 ; }
+	gitChangelog || {
+		writeLog              "ERROR" "Failed to generate change log"
+		exit                                                                 1
+	}
 
 	writeLog "INFO" "Branch changelog"
 
 	cat <<- EOF
-	$CHANGELOG
+		$CHANGELOG
 	EOF
 
 	# Multi-line strings don't work in GitHub Actions without escaping.
@@ -179,30 +193,33 @@ then
 	#echo "::set-output name=changelog::${CHANGELOG}"
 	echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
 	cat <<- EOF >> $GITHUB_OUTPUT
-	$CHANGELOG
+		$CHANGELOG
 	EOF
-  echo "EOF" >> $GITHUB_OUTPUT
+	echo "EOF" >> $GITHUB_OUTPUT
 
 	echo "CHANGELOG<<EOF" >> $GITHUB_ENV
 	cat <<- EOF >> $GITHUB_ENV
-	$CHANGELOG
+		$CHANGELOG
 	EOF
-  echo "EOF" >> $GITHUB_ENV
+	echo "EOF" >> $GITHUB_ENV
 
 fi
 
 # Apply a tag if enabled.
-if [ "${TAG_ENABLE^^}" == "TRUE" ] ;
-then
+if [ "${TAG_ENABLE^^}" == "TRUE" ]; then
 
-	if [ "${CALVER_ENABLE^^}" == "TRUE" ];
-	then
-		gitTag "${CALVER}" "${TAG_FORCE^^}" || { writeLog "ERROR" "Failed to apply the tag ${CALVER}" ; exit 1 ; }
+	if [ "${CALVER_ENABLE^^}" == "TRUE" ]; then
+		gitTag "${CALVER}" "${TAG_FORCE^^}" || {
+			writeLog                                     "ERROR" "Failed to apply the tag ${CALVER}"
+			exit                                                                                            1
+		}
 	fi
 
-	if [ "${SEMVER_ENABLE^^}" == "TRUE" ];
-	then
-		gitTag "${SEMVER}" "${TAG_FORCE^^}" || { writeLog "ERROR" "Failed to apply the tag ${SEMVER}" ; exit 1 ; }
+	if [ "${SEMVER_ENABLE^^}" == "TRUE" ]; then
+		gitTag "${SEMVER}" "${TAG_FORCE^^}" || {
+			writeLog                                     "ERROR" "Failed to apply the tag ${SEMVER}"
+			exit                                                                                            1
+		}
 	fi
 
 fi

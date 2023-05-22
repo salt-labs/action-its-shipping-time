@@ -16,8 +16,7 @@ function checkBin() {
 	local COMMAND="$1"
 
 	#if ( command -v "${COMMAND}" 1> /dev/null ) ; # command breaks with aliases
-	if ( type -P "${COMMAND}" &> /dev/null ) ;
-	then
+	if (type -P "${COMMAND}" &> /dev/null); then
 		writeLog "DEBUG" "The command $COMMAND is available in the Path"
 		return 0
 	else
@@ -30,22 +29,23 @@ function checkBin() {
 function checkReqs() {
 
 	# Make sure all the required binaries are available within the path
-	for BIN in "${REQ_BINS[@]}" ;
-	do
+	for BIN in "${REQ_BINS[@]}"; do
 		writeLog "DEBUG" "Checking for dependant binary ${BIN}"
-		checkBin "${BIN}" || { writeLog "ERROR" "Please install the ${BIN} binary on this system in order to run ${SCRIPT}" ; return 1 ; }
+		checkBin "${BIN}" || {
+			writeLog                   "ERROR" "Please install the ${BIN} binary on this system in order to run ${SCRIPT}"
+			return                                                                                                                  1
+		}
 	done
 
 	return 0
 
 }
 
-function checkPermissions () {
+function checkPermissions()  {
 
 	# Checks if the user is running as root
 
-	if [ "${EUID}" -ne 0 ] ;
-	then
+	if [ "${EUID}" -ne 0 ]; then
 		return 1
 	else
 		return 0
@@ -68,36 +68,36 @@ function checkLogLevel() {
 	# LOGLEVEL="$( echo "${1}" | tr '[:lower:]' '[:upper:]' )"
 	case "${LEVEL^^}" in
 
-		"DEBUG" | "TRACE" )
+		"DEBUG" | "TRACE")
 
 			export LOGLEVEL="DEBUG"
 
-		;;
+			;;
 
-		"INFO" | "INFORMATION" )
+		"INFO" | "INFORMATION")
 
 			export LOGLEVEL="INFO"
 
-		;;
+			;;
 
-		"WARN" | "WARNING" )
+		"WARN" | "WARNING")
 
 			export LOGLEVEL="WARN"
 
-		;;
+			;;
 
-		"ERR" | "ERROR" )
+		"ERR" | "ERROR")
 
 			export LOGLEVEL="ERR"
 
-		;;
+			;;
 
-		* )
+		*)
 
 			writeLog "INFO" "An unknown log level of ${LEVEL^^} was provided, defaulting to INFO"
 			export LOGLEVEL="INFO"
 
-		;;
+			;;
 
 	esac
 
@@ -112,60 +112,57 @@ function writeLog() {
 
 	case "${LEVEL^^}" in
 
-		"DEBUG" | "TRACE" )
+		"DEBUG" | "TRACE")
 
 			LEVEL="DEBUG"
 
 			# Do not show debug messages if the level is > debug
-			if [ ! "${LEVEL^^}" = "${LOGLEVEL^^}" ] ;
-			then
+			if [ ! "${LEVEL^^}" = "${LOGLEVEL^^}" ]; then
 				return 0
 			fi
 
-		;;
+			;;
 
-		"INFO" | "INFORMATION" )
+		"INFO" | "INFORMATION")
 
 			LEVEL="INFO"
 
 			# Do not show info messages if the level is > info
-			if [ "${LOGLEVEL^^}" = "WARN" ] || [ "${LOGLEVEL^^}" = "ERR" ] ;
-			then
+			if [ "${LOGLEVEL^^}" = "WARN" ] || [ "${LOGLEVEL^^}" = "ERR" ]; then
 				return 0
 			fi
 
-		;;
+			;;
 
-		"WARN" | "WARNING" )
+		"WARN" | "WARNING")
 
 			LEVEL="WARN"
 
 			# Do not show warn messages if the level is > warn
-			if [ "${LOGLEVEL^^}" = "ERR" ] ;
-			then
+			if [ "${LOGLEVEL^^}" = "ERR" ]; then
 				return 0
 			fi
 
-		;;
+			;;
 
-		"ERR" | "ERROR" )
+		"ERR" | "ERROR")
 
 			LEVEL="ERR"
 
 			# Errors are always shown
 
-		;;
+			;;
 
-		* )
+		*)
 
 			MESSAGE="Unknown log level ${LEVEL^^} provided to log function. Valid options are DEBUG, INFO, WARN, ERR"
 			LEVEL="ERR"
 
-		;;
+			;;
 
 	esac
 
-	echo "$( date +"%Y/%m/%d %H:%M:%S" ) [${LEVEL^^}] ${MESSAGE}"
+	echo "$(date +"%Y/%m/%d %H:%M:%S") [${LEVEL^^}] ${MESSAGE}"
 
 	return 0
 
@@ -174,7 +171,7 @@ function writeLog() {
 function checkVarEmpty() {
 
 	# Returns true if the variable is empty
-	
+
 	# NOTE:
 	#	Pass this function the string NAME of the variable
 	#	Not the expanded contents of the variable itself.
@@ -182,8 +179,7 @@ function checkVarEmpty() {
 	local VAR_NAME="${1}"
 	local VAR_DESC="${2}"
 
-	if [[ "${!VAR_NAME:-EMPTY}" == "EMPTY" ]];
-	then
+	if [[ "${!VAR_NAME:-EMPTY}" == "EMPTY" ]]; then
 		writeLog "ERROR" "The variable ${VAR_DESC} is empty."
 		return 0
 	else
@@ -193,12 +189,11 @@ function checkVarEmpty() {
 
 }
 
-function checkResult () {
+function checkResult()  {
 
 	local RESULT="${1}"
 
-	if [ "${RESULT}" -ne 0 ];
-	then
+	if [ "${RESULT}" -ne 0 ]; then
 		return 1
 	else
 		return 0
@@ -214,13 +209,13 @@ function usage() {
 
 	cat <<- EOF
 
-	# Release Prep
+		# It's Shipping Time
 
-	    This is a simple script that gets all changes from HEAD back to the last found tag.
+		    This is a simple script that gets all changes from HEAD back to the last found tag.
 
-	    These changes are then spat out in a format suitable for placing into release notes as a changelog.
+		    These changes are then spat out in a format suitable for placing into release notes as a changelog.
 
-	    This is primarily meant to be used as a GitHub Action however if you wish to run as a container in another pipeline, see the environment variables documented on the GitHub README.md
+		    This is primarily meant to be used as a GitHub Action however if you wish to run as a container in another pipeline, see the environment variables documented on the GitHub README.md
 
 	EOF
 
@@ -237,11 +232,17 @@ function gitConfig() {
 	GIT_VERSION=$(git --version)
 	writeLog "INFO" "Configuring ${GIT_VERSION}"
 
-	git config --global user.email "${GITHUB_ACTOR:-user}@users.noreply.github.com" \
-	|| { writeLog "ERROR" "Failed to configure the git user email" ; return 1 ; }
+	git config --global user.email "${GITHUB_ACTOR:-user}@users.noreply.github.com" ||
+		{
+			writeLog "ERROR" "Failed to configure the git user email"
+			return                                                            1
+		}
 
-	git config --global user.name "GitHub Actions" \
-	|| { writeLog "ERROR" "Failed to configure the git user name" ; return 1 ; }
+	git config --global user.name "GitHub Actions" ||
+		{
+			writeLog "ERROR" "Failed to configure the git user name"
+			return                                                           1
+		}
 
 	return 0
 
@@ -253,8 +254,11 @@ function gitFetchAll() {
 
 	writeLog "INFO" "Fetching all Git tags"
 
-	git fetch --prune --tags --prune-tags --all \
-	|| { writeLog "ERROR" "Failed to fetch git tags" ; return 1 ; }
+	git fetch --prune --tags --prune-tags --all ||
+		{
+			writeLog "ERROR" "Failed to fetch git tags"
+			return                                              1
+		}
 
 	return 0
 
@@ -305,7 +309,7 @@ function getCalVer() {
 	local MOD_MATCH="FALSE"
 
 	# Get the latest tag across ALL branches (excluding Semantic Version tags)
-	TAG="$(git --git-dir="${GIT_DIR}" describe --tags --match "[0-9]*" --abbrev=0 "$(git rev-list --tags --max-count=1)" 2>/dev/null)"
+	TAG="$(git --git-dir="${GIT_DIR}" describe --tags --match "[0-9]*" --abbrev=0 "$(git rev-list --tags --max-count=1)" 2> /dev/null)"
 
 	writeLog "DEBUG" "Previous Git Tag: ${TAG}"
 
@@ -354,46 +358,54 @@ function getCalVer() {
 	writeLog "DEBUG" "Git Tag Scheme MAJOR: ${MAJOR_TAG:-EMPTY} MINOR: ${MINOR_TAG:-EMPTY} MICRO: ${MICRO_TAG:-EMPTY} MODIFIER: ${MOD_TAG:-EMPTY}"
 
 	# Process MAJOR
-	if [ "${MAJOR_VER^^}" != "GEN" ] && [ "${MAJOR_VER:-EMPTY}" != "EMPTY" ];
-	then
+	if [ "${MAJOR_VER^^}" != "GEN" ] && [ "${MAJOR_VER:-EMPTY}" != "EMPTY" ]; then
 		writeLog "DEBUG" "Converting MAJOR ${MAJOR_VER} into date format"
-		MAJOR_VER_TEMP=$( date +"$( getDateFormat "${MAJOR_VER}" )" )
+		MAJOR_VER_TEMP=$(date +"$(getDateFormat "${MAJOR_VER}")")
 		MAJOR_VER="${MAJOR_VER_TEMP:-$MAJOR_VER}"
 		MAJOR_VER="${MAJOR_VER//date/}"
 	fi
 
 	# Process MINOR
-	if [ "${MINOR_VER^^}" != "GEN" ] && [ "${MINOR_VER:-EMPTY}" != "EMPTY" ];
-	then
+	if [ "${MINOR_VER^^}" != "GEN" ] && [ "${MINOR_VER:-EMPTY}" != "EMPTY" ]; then
 		writeLog "DEBUG" "Converting MINOR ${MINOR_VER} into date format"
-		MINOR_VER_TEMP=$( date +"$( getDateFormat "${MINOR_VER}" )" )
+		MINOR_VER_TEMP=$(date +"$(getDateFormat "${MINOR_VER}")")
 		MINOR_VER="${MINOR_VER_TEMP:-$MINOR_VER}"
 		MINOR_VER="${MINOR_VER//date/}"
 	fi
 
 	# Process MICRO
-	if [ "${MICRO_VER^^}" != "GEN" ] && [ "${MICRO_VER:-EMPTY}" != "EMPTY" ];
-	then
+	if [ "${MICRO_VER^^}" != "GEN" ] && [ "${MICRO_VER:-EMPTY}" != "EMPTY" ]; then
 		writeLog "DEBUG" "Converting MICRO ${MICRO_VER} into date format"
-		MICRO_VER_TEMP=$( date +"$( getDateFormat "${MICRO_VER}" )" )
+		MICRO_VER_TEMP=$(date +"$(getDateFormat "${MICRO_VER}")")
 		MICRO_VER="${MICRO_VER_TEMP:-$MICRO_VER}"
 		MICRO_VER="${MICRO_VER//date/}"
 	fi
 
 	# Process MOD
-	if [ "${MOD_VER^^}" != "GEN" ] && [ "${MOD_VER:-EMPTY}" != "EMPTY" ];
-	then
+	if [ "${MOD_VER^^}" != "GEN" ] && [ "${MOD_VER:-EMPTY}" != "EMPTY" ]; then
 		writeLog "DEBUG" "Converting MODIFIER ${MOD_VER} into date format"
-		MOD_VER_TEMP=$( date +"$( getDateFormat "${MOD_VER}" )" )
+		MOD_VER_TEMP=$(date +"$(getDateFormat "${MOD_VER}")")
 		MOD_VER="${MOD_VER_TEMP:-$MOD_VER}"
 		MOD_VER="${MOD_VER//date/}"
 	fi
 
 	# Determine if there is a potential tag clash
-	[ "${MAJOR_VER:-EMPTY}" = "${MAJOR_TAG}" ] && { MAJOR_MATCH="TRUE" ; writeLog "DEBUG" "MAJOR Matched existing tag!" ; }
-	[ "${MINOR_VER:-EMPTY}" = "${MINOR_TAG}" ] && { MINOR_MATCH="TRUE" ; writeLog "DEBUG" "MINOR Matched existing tag!" ; }
-	[ "${MICRO_VER:-EMPTY}" = "${MICRO_TAG}" ] && { MICRO_MATCH="TRUE" ; writeLog "DEBUG" "MICRO Matched existing tag!" ; }
-	[ "${MOD_VER:-EMPTY}" = "${MOD_TAG}" ] && { MOD_MATCH="TRUE" ; writeLog "DEBUG" "MODIFIER Matched existing tag!" ; }
+	[ "${MAJOR_VER:-EMPTY}" = "${MAJOR_TAG}" ] && {
+		MAJOR_MATCH="TRUE"
+		writeLog                                                                 "DEBUG" "MAJOR Matched existing tag!"
+	}
+	[ "${MINOR_VER:-EMPTY}" = "${MINOR_TAG}" ] && {
+		MINOR_MATCH="TRUE"
+		writeLog                                                                 "DEBUG" "MINOR Matched existing tag!"
+	}
+	[ "${MICRO_VER:-EMPTY}" = "${MICRO_TAG}" ] && {
+		MICRO_MATCH="TRUE"
+		writeLog                                                                 "DEBUG" "MICRO Matched existing tag!"
+	}
+	[ "${MOD_VER:-EMPTY}" = "${MOD_TAG}" ] && {
+		MOD_MATCH="TRUE"
+		writeLog                                                           "DEBUG" "MODIFIER Matched existing tag!"
+	}
 
 	# The Calendar Versioning scheme stipulates that;
 	#   RULE 1) Both MAJOR MINOR must be CalVer dates
@@ -401,36 +413,31 @@ function getCalVer() {
 	#   RULE 3) MODIFIER is optional string OR generated number
 
 	# If both MAJOR and MINOR are the same, there is risk of tag collision
-	if [ "${MAJOR_MATCH}" == "TRUE" ] && [ "${MINOR_MATCH}" == "TRUE" ];
-	then
+	if [ "${MAJOR_MATCH}" == "TRUE" ] && [ "${MINOR_MATCH}" == "TRUE" ]; then
 
 		writeLog "DEBUG" "Collision for MAJOR MINOR"
 
 		# If MOD is a GEN, then increment by 1 to avoid the collision
-		if [ "${MOD_VER^^}" == "GEN" ];
-		then
+		if [ "${MOD_VER^^}" == "GEN" ]; then
 
 			# If MOD is empty, start from 0
-			if [ "${MOD_TAG:-EMPTY}" == "EMPTY" ];
-			then
+			if [ "${MOD_TAG:-EMPTY}" == "EMPTY" ]; then
 
 				writeLog "DEBUG" "Resetting MODIFIER to 0"
 				MOD_VER="0"
 
 			## If there is a previous tag, however MICRO isn't a match, start from 0
-			elif [ "${MICRO_MATCH}" != "TRUE" ];
-			then
+			elif [ "${MICRO_MATCH}" != "TRUE" ]; then
 
 				# Its a brand new CalVer
 				writeLog "DEBUG" "Resetting MODIFIER to 0"
 				MOD_VER="0"
 
 			# If there is a previous tag and MICRO was a match, increment
-			elif [ "${MICRO_MATCH}" == "TRUE" ];
-			then
+			elif [ "${MICRO_MATCH}" == "TRUE" ]; then
 
 				writeLog "DEBUG" "Incrementing MODIFIER from Tag ${MOD_TAG}"
-				MOD_VER="$( printf %01d $(( MOD_TAG + 1 )) )"
+				MOD_VER="$(printf %01d $((MOD_TAG + 1)))"
 
 			else
 
@@ -441,32 +448,27 @@ function getCalVer() {
 			fi
 
 		# If MICRO is a GEN, then increment by 1 to avoid the collision
-		elif [ "${MICRO_VER^^}" == "GEN" ];
-		then
+		elif [ "${MICRO_VER^^}" == "GEN" ]; then
 
 			# If MICRO is empty, start from 0
-			if [ "${MICRO_TAG:-EMPTY}" == "EMPTY" ];
-			then
+			if [ "${MICRO_TAG:-EMPTY}" == "EMPTY" ]; then
 
 				writeLog "DEBUG" "Resetting MICRO to 0"
 				MICRO_VER="0"
 
 			# Only increment if MOD if not being incremented
-			elif [ "${MOD_VER^^}" != "GEN" ];
-			then
+			elif [ "${MOD_VER^^}" != "GEN" ]; then
 
 				writeLog "DEBUG" "Incrementing MICRO from Tag ${MICRO_TAG}"
-				MICRO_VER="$( printf %01d $(( MICRO_TAG + 1 )) )"
+				MICRO_VER="$(printf %01d $((MICRO_TAG + 1)))"
 
 			fi
 
 		# If neither MICRO or MODIFIER are GENs, only care if there was going to be a total CalVer collision
-		elif [ "${MAJOR_MATCH}" == "TRUE" ] && [ "${MINOR_MATCH}" == "TRUE" ] && [ "${MICRO_MATCH}" == "TRUE" ] && [ "${MOD_MATCH}" == "TRUE" ];
-		then
+		elif [ "${MAJOR_MATCH}" == "TRUE" ] && [ "${MINOR_MATCH}" == "TRUE" ] && [ "${MICRO_MATCH}" == "TRUE" ] && [ "${MOD_MATCH}" == "TRUE" ]; then
 
 			# There was a Tag collision which cannot be avoided
-			if [ "${TAGS_FORCE:-FALSE}" == "TRUE" ] ;
-			then
+			if [ "${TAGS_FORCE:-FALSE}" == "TRUE" ]; then
 				writeLog "WARN" "TAG COLLISION DETECTED: Existing tag will be moved to HEAD"
 			else
 				writeLog "WARN" "TAG COLLISION DETECTED: Tag force is not enabled so no tag will be applied."
@@ -483,14 +485,12 @@ function getCalVer() {
 		# It's a brand new Calendatr Versioning day, start from 0
 		writeLog "DEBUG" "No Collision for MAJOR MINOR"
 
-		if [ "${MICRO_VER^^}" == "GEN" ];
-		then
+		if [ "${MICRO_VER^^}" == "GEN" ]; then
 			writeLog "DEBUG" "Resetting MICRO to 0"
 			MICRO_VER="0"
 		fi
 
-		if [ "${MOD_VER^^}" == "GEN" ];
-		then
+		if [ "${MOD_VER^^}" == "GEN" ]; then
 			writeLog "DEBUG" "Resetting MODIFIER to 0"
 			MOD_VER="0"
 		fi
@@ -520,55 +520,55 @@ function getDateFormat() {
 
 	case "${FORMAT}" in
 
-		YYYY )
+		YYYY)
 			# Full year - 2006, 2016, 2106
 			DATE_FORMAT="%Y"
-		;;
+			;;
 
-		YY )
+		YY)
 			# Short year - 6, 16, 106
 			DATE_FORMAT="%-y"
-		;;
+			;;
 
-		0Y )
+		0Y)
 			# Zero-padded year - 06, 16, 106
 			DATE_FORMAT="%y"
-		;;
+			;;
 
-		MM )
+		MM)
 			# Short month - 1, 2 ... 11, 12
 			DATE_FORMAT="%-m"
-		;;
+			;;
 
-		0M )
+		0M)
 			# Zero-padded month - 01, 02 ... 11, 12
 			DATE_FORMAT="%m"
-		;;
+			;;
 
-		WW )
+		WW)
 			# Short week (since start of year) - 1, 2, 33, 52
 			DATE_FORMAT="%-U"
-		;;
+			;;
 
-		0W )
+		0W)
 			# Zero-padded week - 01, 02, 33, 52
 			DATE_FORMAT="%U"
-		;;
+			;;
 
-		DD )
+		DD)
 			# Short day - 1, 2 ... 30, 31
 			DATE_FORMAT="%-d"
-		;;
+			;;
 
-		0D )
+		0D)
 			# Zero-padded day - 01, 02 ... 30, 31
 			DATE_FORMAT="%d"
-		;;
+			;;
 
-		* )
+		*)
 			# Strip the invalid passed format so date command doesn't bork
 			DATE_FORMAT=""
-		;;
+			;;
 
 	esac
 
@@ -587,18 +587,20 @@ function gitChangelog() {
 	local GIT_DIR="${GIT_DIR:=.git/}"
 
 	# Get the latest tag across ALL branches
-	TAG="$(git --git-dir="${GIT_DIR}" describe --tags "$(git rev-list --tags --max-count=1)" 2>/dev/null)"
+	TAG="$(git --git-dir="${GIT_DIR}" describe --tags "$(git rev-list --tags --max-count=1)" 2> /dev/null)"
 	writeLog "DEBUG" "Previous Git Tag: ${TAG}"
 
 	# If there is no tags, just get the full history
-	if [ "${TAG:-EMPTY}" == "EMPTY" ];
-	then
+	if [ "${TAG:-EMPTY}" == "EMPTY" ]; then
 
 		writeLog "INFO" "No tags found, gathering full commit history"
 
 		CHANGELOG=$(git --git-dir="${GIT_DIR}" log --pretty=format:"${GIT_PRETTY_FORMAT}")
 
-		checkResult $? || { writeLog "ERROR" "Failed to obtain change log for full commit history" ; return 1 ; }
+		checkResult $? || {
+			writeLog                "ERROR" "Failed to obtain change log for full commit history"
+			return                                                                                         1
+		}
 
 	else
 
@@ -606,12 +608,14 @@ function gitChangelog() {
 
 		CHANGELOG=$(git --git-dir="${GIT_DIR}" log "${TAG}"..HEAD --pretty=format:"${GIT_PRETTY_FORMAT}")
 
-		checkResult $? || { writeLog "ERROR" "Failed to obtain change log between HEAD and ${TAG}" ; return 1 ; }
+		checkResult $? || {
+			writeLog                "ERROR" "Failed to obtain change log between HEAD and ${TAG}"
+			return                                                                                         1
+		}
 
 	fi
 
-	if [ ! "${CHANGELOG:-EMPTY}" == "EMPTY" ];
-	then
+	if [ ! "${CHANGELOG:-EMPTY}" == "EMPTY" ]; then
 
 		writeLog "INFO" "Recording changelog"
 
@@ -623,8 +627,7 @@ function gitChangelog() {
 		CHANGELOG=$(git --git-dir="${GIT_DIR}" log -n1 --pretty=format:"${GIT_PRETTY_FORMAT}")
 
 		# If the changelog is still empty, something has gone really wrong :/
-		if [ "${CHANGELOG:-EMPTY}" == "EMPTY" ];
-		then
+		if [ "${CHANGELOG:-EMPTY}" == "EMPTY" ]; then
 
 			writeLog "ERROR" "Failed to obtain changelog!"
 			return 1
@@ -656,18 +659,23 @@ function gitTag() {
 	writeLog "INFO" "Applying Git tag ${TAG}"
 
 	# Apply the tag
-	if [ "${FORCE:-FALSE}" == "TRUE" ];
-	then
+	if [ "${FORCE:-FALSE}" == "TRUE" ]; then
 
 		git --git-dir="${GIT_DIR}" \
-			tag --annotate --no-sign --force --message "Release ${TAG}" "${TAG}" \
-			|| { writeLog "ERROR" "Unable to apply tag ${TAG}" ; return 1 ; }
+			tag --annotate --no-sign --force --message "Release ${TAG}" "${TAG}" ||
+			{
+				writeLog "ERROR" "Unable to apply tag ${TAG}"
+				return                                                 1
+			}
 
 	else
 
 		git --git-dir="${GIT_DIR}" \
-			tag --annotate --no-sign --message "Release ${TAG}" "${TAG}" \
-			|| { writeLog "ERROR" "Unable to apply tag ${TAG}. Force is not enabled" ; return 0 ; }
+			tag --annotate --no-sign --message "Release ${TAG}" "${TAG}" ||
+			{
+				writeLog "ERROR" "Unable to apply tag ${TAG}. Force is not enabled"
+				return                                                                       0
+			}
 
 	fi
 
@@ -675,15 +683,21 @@ function gitTag() {
 
 	# List current tags
 	git --git-dir="${GIT_DIR}" \
-		tag --list -n1 \
-		|| { writeLog "ERROR" "Failed to list tags" ; return 1 ; }
+		tag --list -n1 ||
+		{
+			writeLog "ERROR" "Failed to list tags"
+			return                                          1
+		}
 
 	writeLog "INFO" "Pushing new Git tag ${TAG} to origin"
 
 	# Push the changes back
 	git --git-dir="${GIT_DIR}" \
-		push origin --force --tags \
-		|| { writeLog "ERROR" "Failed to push tag ${TAG} to origin" ; return 1 ; }
+		push origin --force --tags ||
+		{
+			writeLog "ERROR" "Failed to push tag ${TAG} to origin"
+			return                                                          1
+		}
 
 	return 0
 
@@ -702,11 +716,10 @@ function getSemVer() {
 	local PATCH="0"
 
 	# Get the latest tag across ALL branches (excluding Calendar Version tags)
-	TAG="$(git --git-dir="${GIT_DIR}" describe --tags --match "${PREFIX}[0-9]*" --abbrev=0 "$(git rev-list --tags --max-count=1)" 2>/dev/null)"
+	TAG="$(git --git-dir="${GIT_DIR}" describe --tags --match "${PREFIX}[0-9]*" --abbrev=0 "$(git rev-list --tags --max-count=1)" 2> /dev/null)"
 
 	# Break the last Tag into MAJOR.MINOR.PATCH
-	if [ "${TAG:-EMPTY}" == "EMPTY" ];
-	then
+	if [ "${TAG:-EMPTY}" == "EMPTY" ]; then
 
 		# No existing Semantic Version tag was found
 		writeLog "INFO" "No existing Semantic Version tag was found, defaulting to v0.0.0"
@@ -717,20 +730,18 @@ function getSemVer() {
 		IFS="." read -r -a SEMVER_ARRAY <<< "${TAG}"
 
 		# Ensure the found tag is in the MAJOR.MINOR.PATCH format
-		if [ "${#SEMVER_ARRAY[@]}" -ne 3 ];
-		then
+		if [ "${#SEMVER_ARRAY[@]}" -ne 3 ]; then
 			writeLog "ERROR" "The tag ${TAG} is not in the correct Semantic Version that was supplied, should be MAJOR.MINOR.PATCH"
 			return 1
 		fi
 
 		# Strip the 'v' from the front of MAJOR
-		if [[ "${SEMVER_ARRAY[0]}" =~ ([vV]?)([0-9]+) ]];
-		then
+		if [[ "${SEMVER_ARRAY[0]}" =~ ([vV]?)([0-9]+) ]]; then
 			PREFIX="${BASH_REMATCH[1]}"
 			MAJOR="${BASH_REMATCH[2]}"
-  		else
-		    MAJOR=""
-	 	fi
+		else
+			MAJOR=""
+		fi
 
 		MINOR="${SEMVER_ARRAY[1]}"
 		PATCH="${SEMVER_ARRAY[2]}"
@@ -739,22 +750,22 @@ function getSemVer() {
 
 	case "${SEMVER_TYPE^^}" in
 
-		"MAJOR" )
-			MAJOR=$((MAJOR+1))
-		;;
+		"MAJOR")
+			MAJOR=$((MAJOR + 1))
+			;;
 
-		"MINOR" )
-			MINOR=$((MINOR+1))
-		;;
+		"MINOR")
+			MINOR=$((MINOR + 1))
+			;;
 
-		"PATCH" )
-			PATCH=$((PATCH+1))
-		;;
+		"PATCH")
+			PATCH=$((PATCH + 1))
+			;;
 
-		* )
+		*)
 			writeLog "ERROR" "Unknown Semantic Version type provided of $SEMVER_TYPE"
 			return 1
-		;;
+			;;
 
 	esac
 
