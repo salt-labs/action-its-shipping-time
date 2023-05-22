@@ -138,7 +138,7 @@ jobs:
           flavor: |
             latest=true
           tags: |
-            type=raw,value=release-candidate
+            type=raw,value=latest
             type=raw,value=unstable
             type=sha,format=long
             type=ref,event=branch
