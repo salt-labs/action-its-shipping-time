@@ -50,7 +50,7 @@ export SEMVER=""
 #########################
 
 # All the required external binaries for this script to work.
-export declare -r REQ_BINS=(
+declare -r REQ_BINS=(
 	echo
 	date
 	git
@@ -98,6 +98,8 @@ fi
 
 if [ "${LOGLEVEL}" == "DEBUG" ]; then
 
+	writeLog "DEBUG" "########## Start Dump ##########"
+
 	writeLog "DEBUG" "Dumping diagnostic information for shell ${SHELL} ${BASH_VERSION}"
 
 	writeLog "DEBUG" "########## Environment ##########"
@@ -111,6 +113,8 @@ if [ "${LOGLEVEL}" == "DEBUG" ]; then
 
 	writeLog "DEBUG" "########## Exported Function Contents ##########"
 	export -f
+
+	writeLog "DEBUG" "########## End Dump ##########"
 
 fi
 
